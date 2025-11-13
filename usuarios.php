@@ -1,6 +1,15 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para gestionar usuarios
+verificar_permiso('empleados');
+
 // Conexión a la base de datos
 include("conexion2.php");
+
+// Incluir configuración de roles
+require_once 'roles_config.php';
 
 // Función para sanitizar entradas
 function sanitize($input) {
@@ -31,46 +40,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action ==
     $usuario = isset($_POST['usuario']) ? sanitize($_POST['usuario']) : '';
     $pass = isset($_POST['pass']) ? sanitize($_POST['pass']) : '';
     $correo = isset($_POST['correo']) ? sanitize($_POST['correo']) : '';
+    $rol = isset($_POST['rol']) ? sanitize($_POST['rol']) : 'Empleado';
+
+    // Validar que el rol sea válido
+    if (!es_rol_valido($rol)) {
+        $rol = 'Empleado'; // Por defecto
+    }
 
     if ($action === 'create') {
-        // Crear nuevo usuario
-        $sql = "INSERT INTO usuarios (Clave, NombreCompleto, Departamento, Sucursal, FechaIngreso, Puesto, usuario, pass, correo) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $params = array($clave, $nombreCompleto, $departamento, $sucursal, $fechaObj, $puesto, $usuario, $pass, $correo);
-        $stmt = sqlsrv_query($conn, $sql, $params);
-
-        if ($stmt === false) {
-            $error = "Error al crear usuario: " . print_r(sqlsrv_errors(), true);
+        // Verificar permiso para crear usuarios
+        if (!verificar_permiso_accion('usuarios', 'crear', false)) {
+            $error = "No tiene permisos para crear usuarios";
         } else {
-            $success = "Usuario creado exitosamente";
+            // Crear nuevo usuario
+            $sql = "INSERT INTO usuarios (Clave, NombreCompleto, Departamento, Sucursal, FechaIngreso, Puesto, usuario, pass, correo, rol)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $params = array($clave, $nombreCompleto, $departamento, $sucursal, $fechaObj, $puesto, $usuario, $pass, $correo, $rol);
+            $stmt = sqlsrv_query($conn, $sql, $params);
+
+            if ($stmt === false) {
+                $error = "Error al crear usuario: " . print_r(sqlsrv_errors(), true);
+            } else {
+                $success = "Usuario creado exitosamente";
+            }
         }
     } elseif ($action === 'update') {
-        // Actualizar usuario existente
-        $sql = "UPDATE usuarios SET NombreCompleto = ?, Departamento = ?, Sucursal = ?, 
-                FechaIngreso = ?, Puesto = ?, usuario = ?, pass = ?, correo = ? WHERE Clave = ?";
-        $params = array($nombreCompleto, $departamento, $sucursal, $fechaObj, $puesto, 
-                        $usuario, $pass, $correo, $clave);
-        $stmt = sqlsrv_query($conn, $sql, $params);
-
-        if ($stmt === false) {
-            $error = "Error al actualizar usuario: " . print_r(sqlsrv_errors(), true);
+        // Verificar permiso para editar usuarios
+        if (!verificar_permiso_accion('usuarios', 'editar', false)) {
+            $error = "No tiene permisos para editar usuarios";
         } else {
-            $success = "Usuario actualizado exitosamente";
+            // Actualizar usuario existente
+            $sql = "UPDATE usuarios SET NombreCompleto = ?, Departamento = ?, Sucursal = ?,
+                    FechaIngreso = ?, Puesto = ?, usuario = ?, pass = ?, correo = ?, rol = ? WHERE Clave = ?";
+            $params = array($nombreCompleto, $departamento, $sucursal, $fechaObj, $puesto,
+                            $usuario, $pass, $correo, $rol, $clave);
+            $stmt = sqlsrv_query($conn, $sql, $params);
+
+            if ($stmt === false) {
+                $error = "Error al actualizar usuario: " . print_r(sqlsrv_errors(), true);
+            } else {
+                $success = "Usuario actualizado exitosamente";
+            }
         }
     }
 }
 
  elseif ($action === 'delete' && isset($_GET['id'])) {
-    // Eliminar usuario
-    $clave = sanitize($_GET['id']);
-    $sql = "DELETE FROM usuarios WHERE Clave = ?";
-    $params = array($clave);
-    $stmt = sqlsrv_query($conn, $sql, $params);
-
-    if ($stmt === false) {
-        $error = "Error al eliminar usuario: " . print_r(sqlsrv_errors(), true);
+    // Verificar permiso para eliminar usuarios
+    if (!verificar_permiso_accion('usuarios', 'eliminar', false)) {
+        $error = "No tiene permisos para eliminar usuarios";
     } else {
-        $success = "Usuario eliminado exitosamente";
+        // Eliminar usuario
+        $clave = sanitize($_GET['id']);
+        $sql = "DELETE FROM usuarios WHERE Clave = ?";
+        $params = array($clave);
+        $stmt = sqlsrv_query($conn, $sql, $params);
+
+        if ($stmt === false) {
+            $error = "Error al eliminar usuario: " . print_r(sqlsrv_errors(), true);
+        } else {
+            $success = "Usuario eliminado exitosamente";
+        }
     }
 }
 
@@ -209,8 +239,28 @@ if ($stmt !== false) {
                         </div>
                         <div class="col-md-4">
                             <label for="correo" class="form-label">Correo</label>
-                            <input type="email" class="form-control" id="correo" name="correo" 
+                            <input type="email" class="form-control" id="correo" name="correo"
                                 value="<?php echo $userToEdit ? $userToEdit['correo'] : ''; ?>" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="rol" class="form-label">Rol del Sistema</label>
+                            <select class="form-select" id="rol" name="rol" required>
+                                <option value="" disabled <?php echo !$userToEdit ? 'selected' : ''; ?>>Seleccione un rol</option>
+                                <?php
+                                // Mostrar todos los roles disponibles
+                                foreach ($roles_validos as $rol_opcion) {
+                                    $selected = ($userToEdit && $userToEdit['rol'] === $rol_opcion) ? 'selected' : '';
+                                    $descripcion = get_descripcion_rol($rol_opcion);
+                                    echo "<option value='$rol_opcion' $selected>$rol_opcion - $descripcion</option>";
+                                }
+                                ?>
+                            </select>
+                            <small class="form-text text-muted">
+                                El rol determina los permisos de acceso en el sistema
+                            </small>
                         </div>
                     </div>
                     
@@ -241,13 +291,14 @@ if ($stmt !== false) {
                                 <th>Puesto</th>
                                 <th>Usuario</th>
                                 <th>Correo</th>
+                                <th>Rol</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($usuarios)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center">No hay usuarios registrados</td>
+                                    <td colspan="9" class="text-center">No hay usuarios registrados</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($usuarios as $usuario): ?>
@@ -260,13 +311,29 @@ if ($stmt !== false) {
                                         <td><?php echo $usuario['usuario']; ?></td>
                                         <td><?php echo $usuario['correo']; ?></td>
                                         <td>
+                                            <?php
+                                            $rol_usuario = isset($usuario['rol']) ? $usuario['rol'] : 'Sin asignar';
+                                            $badge_class = 'bg-secondary';
+                                            if ($rol_usuario === ROL_ADMINISTRADOR) $badge_class = 'bg-danger';
+                                            elseif ($rol_usuario === ROL_SUPERVISOR) $badge_class = 'bg-primary';
+                                            elseif ($rol_usuario === ROL_INSTRUCTOR) $badge_class = 'bg-info';
+                                            elseif ($rol_usuario === ROL_GERENTE) $badge_class = 'bg-success';
+                                            elseif ($rol_usuario === ROL_EMPLEADO) $badge_class = 'bg-secondary';
+                                            ?>
+                                            <span class="badge <?php echo $badge_class; ?>"><?php echo $rol_usuario; ?></span>
+                                        </td>
+                                        <td>
+                                            <?php if (verificar_permiso_accion('usuarios', 'editar', false)): ?>
                                             <a href="?action=edit&id=<?php echo $usuario['Clave']; ?>" class="btn btn-sm btn-warning me-1">
                                                 <i class="bi bi-pencil"></i> Editar
                                             </a>
-                                            <a href="?action=delete&id=<?php echo $usuario['Clave']; ?>" class="btn btn-sm btn-danger" 
+                                            <?php endif; ?>
+                                            <?php if (verificar_permiso_accion('usuarios', 'eliminar', false)): ?>
+                                            <a href="?action=delete&id=<?php echo $usuario['Clave']; ?>" class="btn btn-sm btn-danger"
                                                onclick="return confirm('¿Está seguro de eliminar este usuario?')">
                                                 <i class="bi bi-trash"></i> Eliminar
                                             </a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

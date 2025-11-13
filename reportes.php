@@ -1,4 +1,9 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para reportes
+verificar_permiso('reportes');
 
 // Obtener el tipo de reporte solicitado
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'default';

@@ -1,4 +1,10 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para gestionar cursos por puesto
+verificar_permiso('cursoxpuesto');
+
 // Incluir el archivo de conexión
 include 'conexion2.php';
 

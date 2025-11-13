@@ -1,4 +1,9 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para certificaciones
+verificar_permiso('certificados');
 
 // Configuración de la conexión a la base de datos SQL Server
 include("conexion2.php");

@@ -1,14 +1,17 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar autenticación
+requerir_autenticacion();
+
 // Conexión a la base de datos
 include("conexion2.php");
 
-session_start();
-
-// Verificar si el usuario está logueado
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: index.php");
-    exit();
-}
+// Obtener información del usuario
+$usuario_actual = get_usuario_actual();
+$rol_actual = get_rol_usuario();
+$nombre_completo = get_nombre_completo_usuario();
 
 // Consulta para contar empleados activos
 $sql_empleados = "SELECT COUNT(*) as total_empleados FROM usuarios";
@@ -54,35 +57,57 @@ $total_completados = $row_completados['total_completados'];
                 <i class="fas fa-home"></i>
                 <span>Inicio</span>
             </a>
+
+            <?php if (tiene_permiso($rol_actual, 'empleados')): ?>
             <a href="#empleados" class="nav-item" data-page="empleados">
                 <i class="fas fa-users"></i>
                 <span>Empleados</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'cursos')): ?>
             <a href="#cursos" class="nav-item" data-page="cursos">
                 <i class="fas fa-user-graduate"></i>
                 <span>Cursos</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'puestos')): ?>
             <a href="#puestos" class="nav-item" data-page="puestos">
                 <i class="fas fa-briefcase"></i>
                 <span>Puestos</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'cursoxpuesto')): ?>
             <a href="#cursoxpuesto" class="nav-item" data-page="cursoxpuesto">
                 <i class="fas fa-clipboard-check"></i>
                 <span>Cursos Por Puesto</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'planeacion')): ?>
             <a href="#planeacion" class="nav-item" data-page="planeacion">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Programar Capacitación</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'capacitacion')): ?>
             <a href="#capacitacion" class="nav-item" data-page="capacitacion">
                 <i class="fas fa-user-plus"></i>
                 <span>Asignar Participantes</span>
             </a>
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'certificados')): ?>
             <a href="#certificados" class="nav-item" data-page="certificados">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Capacitaciones y Certificados</span>
             </a>
-           
+            <?php endif; ?>
+
+            <?php if (tiene_permiso($rol_actual, 'reportes')): ?>
             <!-- Opción de Reportes en el menú superior con dropdown -->
             <div class="nav-dropdown">
                 <a href="#reportes" class="nav-item dropdown-toggle" data-page="reportes">
@@ -104,12 +129,28 @@ $total_completados = $row_completados['total_completados'];
                     <a href="#reportes-faltas" class="dropdown-item">Faltas</a>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
 
         <div class="navbar-user">
             <div class="user-info">
                 <i class="fas fa-user-circle"></i>
-                <span>Bienvenido, <span class="user-name"><?php echo htmlspecialchars($_SESSION['usuario']); ?></span></span>
+                <span>
+                    <?php echo $nombre_completo ? htmlspecialchars($nombre_completo) : htmlspecialchars($usuario_actual); ?>
+                    <br>
+                    <small style="font-size: 0.8em; opacity: 0.8;">
+                        <?php
+                        $badge_color = '#6c757d';
+                        if ($rol_actual === ROL_ADMINISTRADOR) $badge_color = '#dc3545';
+                        elseif ($rol_actual === ROL_SUPERVISOR) $badge_color = '#0d6efd';
+                        elseif ($rol_actual === ROL_INSTRUCTOR) $badge_color = '#0dcaf0';
+                        elseif ($rol_actual === ROL_GERENTE) $badge_color = '#198754';
+                        ?>
+                        <span style="background-color: <?php echo $badge_color; ?>; padding: 2px 8px; border-radius: 10px; color: white;">
+                            <?php echo htmlspecialchars($rol_actual); ?>
+                        </span>
+                    </small>
+                </span>
             </div>
             <a href="logout.php" class="nav-item logout-btn">
                 <i class="fas fa-sign-out-alt"></i>

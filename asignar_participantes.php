@@ -1,4 +1,10 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para asignar capacitaciones
+verificar_permiso('capacitacion');
+
 // Incluir archivo de conexión a la base de datos
 include 'conexion2.php';
 

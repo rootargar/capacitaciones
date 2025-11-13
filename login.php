@@ -8,8 +8,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = $_POST['usuario'];
     $password = $_POST['password'];
 
-    // Consulta SQL para verificar las credenciales
-    $sql = "SELECT usuario, pass FROM usuarios WHERE usuario = ? AND pass = ?";
+    // Consulta SQL para verificar las credenciales y obtener información del usuario
+    $sql = "SELECT usuario, pass, rol, NombreCompleto, Clave FROM usuarios WHERE usuario = ? AND pass = ?";
     $params = array($usuario, $password);
     $stmt = sqlsrv_query($conn, $sql, $params);
 
@@ -21,12 +21,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $estado_login = "fallido";
 
     if (sqlsrv_has_rows($stmt)) {
-        // Login exitoso
+        // Obtener datos del usuario
+        $user_data = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+        // Login exitoso - Guardar información en sesión
         $_SESSION['usuario'] = $usuario;
         $_SESSION['loggedin'] = true;
-        
+        $_SESSION['rol'] = $user_data['rol'];
+        $_SESSION['nombre_completo'] = $user_data['NombreCompleto'];
+        $_SESSION['clave_usuario'] = $user_data['Clave'];
+
         $estado_login = "exitoso";
-        
+
         // Preparar redirección (se ejecutará después de registrar la auditoría)
         $redireccion = "principal.php";
     } else {

@@ -1,4 +1,10 @@
 <?php
+// Incluir validación de autenticación y permisos
+require_once 'auth_check.php';
+
+// Verificar que el usuario tenga permiso para actividades
+verificar_permiso('actividades');
+
 // Conexión a la base de datos
 include("conexion2.php");
 // Inicializar variables
