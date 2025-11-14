@@ -24,6 +24,16 @@
 5. **RESUMEN_CAMBIOS.md**
    - Este archivo - resumen rápido de cambios
 
+6. **reportes/cursos_concluidos.php**
+   - Reporte de cursos concluidos con filtrado por rol
+   - Empleados ven solo sus propios cursos
+   - Incluye exportación a Excel e impresión
+
+7. **reportes/cursos_faltantes.php**
+   - Reporte de cursos faltantes/pendientes con filtrado por rol
+   - Empleados ven solo sus cursos pendientes
+   - Incluye exportación a Excel e impresión
+
 ## Archivos Modificados
 
 ### Archivos de Autenticación
@@ -45,6 +55,8 @@
    - Líneas 1-14: Sistema de autenticación con roles
    - Líneas 61-132: Menú dinámico según permisos del rol
    - Líneas 138-153: Información de usuario con nombre y badge de rol
+   - Líneas 161-299: Tarjetas del dashboard con validación de permisos
+   - Líneas 110-143: Menú de reportes adaptativo según rol (empleados ven solo cursos concluidos y faltantes)
 
 4. **cursos.php**
    - Líneas 1-6: Validación de autenticación y permiso 'cursos'
@@ -111,10 +123,11 @@ Cursos x Puesto       ✓        ✓           ✗         ✗        ✗
 Planeación            ✓        ✓           ✓         ✗        ✗
 Asignar Particip.     ✓        ✓           ✓         ✗        ✗
 Certificados          ✓        ✓           ✓         ✓        ✓*
-Reportes              ✓        ✓           ✗         ✓        ✗
+Reportes              ✓        ✓           ✗         ✓        ✓**
 Actividades           ✓        ✓           ✓         ✗        ✗
 
 * Empleados solo ven sus propios registros
+** Empleados solo ven reportes de sus cursos concluidos y faltantes
 ```
 
 ## Características Principales
@@ -125,6 +138,9 @@ Actividades           ✓        ✓           ✓         ✗        ✗
 ✅ Validación de acciones específicas (crear, editar, eliminar)
 ✅ Sistema compatible con estructura existente
 ✅ Sin reescritura completa del código
+✅ Reportes personalizados con filtrado automático por rol
+✅ Empleados pueden ver sus cursos concluidos y faltantes
+✅ Exportación a Excel e impresión de reportes
 
 ## Notas Importantes
 
@@ -134,6 +150,15 @@ Actividades           ✓        ✓           ✓         ✗        ✗
 - **Todos los usuarios deben cerrar sesión y volver a iniciar** para que los cambios surtan efecto
 
 ---
-**Total de archivos nuevos**: 5
-**Total de archivos modificados**: 12
+**Total de archivos nuevos**: 7
+**Total de archivos modificados**: 13
 **Cambios en BD**: 1 tabla (usuarios)
+
+## Últimas Actualizaciones
+
+### Acceso a Reportes para Empleados (Actualización 2025-01-13)
+- ✅ Empleados ahora pueden acceder al módulo de Reportes
+- ✅ Solo ven reportes de "Cursos Concluidos" y "Cursos Faltantes"
+- ✅ Los datos están filtrados automáticamente para mostrar solo información personal
+- ✅ Menú de reportes adaptativo: Admin/Supervisor ven todas las opciones, Empleados solo 2 opciones
+- ✅ Funcionalidad de impresión y exportación a Excel incluida en reportes
