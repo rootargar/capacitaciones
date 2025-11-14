@@ -116,6 +116,7 @@ $total_completados = $row_completados['total_completados'];
                     <i class="fas fa-angle-down"></i>
                 </a>
                 <div class="dropdown-menu" id="dropdown-reportes">
+                    <?php if (es_administrador() || es_supervisor()): ?>
                     <a href="#reportes-empleados" class="dropdown-item">Empleados</a>
                     <a href="#reportes-cursos" class="dropdown-item">Cursos</a>
                     <a href="#reportes-puestos" class="dropdown-item">Puestos</a>
@@ -123,10 +124,20 @@ $total_completados = $row_completados['total_completados'];
                     <a href="#reportes-cursos-programados" class="dropdown-item">Cursos Programados</a>
                     <a href="#reportes-capacitaciones" class="dropdown-item">Capacitaciones</a>
                     <a href="#reportes-proximas-capacitaciones" class="dropdown-item">Próximas Capacitaciones</a>
+                    <?php endif; ?>
+
+                    <?php if (tiene_permiso_accion($rol_actual, 'reportes', 'cursos_concluidos')): ?>
                     <a href="#reportes-cursos-concluidos" class="dropdown-item">Cursos Concluidos</a>
+                    <?php endif; ?>
+
+                    <?php if (tiene_permiso_accion($rol_actual, 'reportes', 'cursos_faltantes')): ?>
                     <a href="#reportes-cursos-faltantes" class="dropdown-item">Cursos Faltantes</a>
+                    <?php endif; ?>
+
+                    <?php if (es_administrador() || es_supervisor()): ?>
                     <a href="#reportes-asistencias" class="dropdown-item">Asistencias</a>
                     <a href="#reportes-faltas" class="dropdown-item">Faltas</a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>

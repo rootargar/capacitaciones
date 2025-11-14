@@ -94,7 +94,7 @@ $permisos = [
         ROL_SUPERVISOR => true,     // Todos los reportes
         ROL_INSTRUCTOR => false,
         ROL_GERENTE => true,        // Reportes generales
-        ROL_EMPLEADO => false
+        ROL_EMPLEADO => true        // Solo reportes propios (cursos concluidos y faltantes)
     ],
 
     // Módulo de actividades
@@ -132,7 +132,9 @@ $permisos_acciones = [
     ],
     'reportes' => [
         'generales' => [ROL_ADMINISTRADOR, ROL_SUPERVISOR, ROL_GERENTE],
-        'detallados' => [ROL_ADMINISTRADOR, ROL_SUPERVISOR]
+        'detallados' => [ROL_ADMINISTRADOR, ROL_SUPERVISOR],
+        'cursos_concluidos' => [ROL_ADMINISTRADOR, ROL_SUPERVISOR, ROL_GERENTE, ROL_EMPLEADO],
+        'cursos_faltantes' => [ROL_ADMINISTRADOR, ROL_SUPERVISOR, ROL_GERENTE, ROL_EMPLEADO]
     ]
 ];
 
