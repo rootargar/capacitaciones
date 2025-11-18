@@ -66,8 +66,8 @@ if($stmt === false) {
             margin-bottom: 20px;
         }
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro estandarizado */
+            color: #4B5563; /* Gris oscuro estandarizado */
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;

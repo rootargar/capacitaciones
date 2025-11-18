@@ -84,16 +84,16 @@ $stats = sqlsrv_fetch_array($stmtStats, SQLSRV_FETCH_ASSOC);
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
-            color: white;
+            color: #4B5563; /* Gris oscuro estandarizado */
         }
         .stats-card-1 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro */
         }
         .stats-card-2 {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #B0C4DE 0%, #D1D5DB 100%); /* Azul claro a gris */
         }
         .stats-card-3 {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #7FC7D9 0%, #87CEEB 100%); /* Azul medio claro */
         }
         .stats-card h3 {
             margin: 0;

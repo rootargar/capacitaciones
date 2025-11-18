@@ -7,15 +7,15 @@
     <style>
          body {
             background-image: url('images/fondo.jpg');
-            background-color:rgb(110, 184, 236); 
+            background-color: #E0F2F7; /* Azul muy claro estandarizado */
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-repeat: no-repeat; 
+            background-repeat: no-repeat;
             background-position: center;
-            background-size: cover; 
+            background-size: cover;
             height: 50vh;
-   
+
         }
         
         .login-form {
@@ -43,22 +43,22 @@
         input[type="submit"] {
             width: 100%;
             padding: 10px;
-            background-color: #019DF4; /* Azul Movistar para el botón */
-            color: white;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro estandarizado */
+            color: #4B5563; /* Gris oscuro estandarizado */
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
         }
-        
+
         input[type="submit"]:hover {
-            background-color: #0082CF; /* Un poco más oscuro al pasar el mouse */
+            background: linear-gradient(135deg, #B0C4DE 0%, #87CEEB 100%); /* Azul claro invertido */
         }
-        
+
         .header-logo {
             text-align: center;
             margin-bottom: 20px;
-            color: #019DF4;
+            color: #87CEEB; /* Azul claro estandarizado */
             font-size: 24px;
             font-weight: bold;
         }

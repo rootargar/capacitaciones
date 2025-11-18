@@ -17,8 +17,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, #04027c 0%, #2468c0 100%); /* Cambiado a azul claro */
-    color: #9da6af; /* Cambiado a gris oscuro para mejor contraste */
+    background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro estandarizado */
+    color: #4B5563; /* Gris oscuro estandarizado */
     padding: 1rem 1.5rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     position: sticky;
@@ -141,7 +141,7 @@ body {
     gap: 0.3rem;
     padding: 0.6rem 0.8rem;
     text-decoration: none;
-    color: #bac4cf; /* Cambiado a gris oscuro */
+    color: #4B5563; /* Gris oscuro estandarizado */
     border-radius: 6px;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -152,15 +152,15 @@ body {
 }
 
 .nav-item:hover {
-    background-color: rgba(44, 62, 80, 0.1); /* Ajustado para el nuevo color */
+    background-color: rgba(135, 206, 235, 0.2); /* Azul claro transparente */
     transform: translateY(-2px);
-    color: #b8c0c9; /* Color más oscuro en hover */
+    color: #6B7280; /* Gris medio oscuro en hover */
 }
 
 .nav-item.active {
-    background-color: rgba(44, 62, 80, 0.15); /* Ajustado para el nuevo color */
+    background-color: rgba(135, 206, 235, 0.3); /* Azul claro más opaco */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    color: #aeb8c2;
+    color: #4B5563; /* Gris oscuro */
 }
 
 .nav-item i {
@@ -261,13 +261,13 @@ body {
 }
 
 .logout-btn {
-    background-color: rgba(44, 62, 80, 0.1); /* Ajustado para el nuevo color */
-    border: 1px solid rgba(44, 62, 80, 0.2); /* Ajustado para el nuevo color */
-    color: #2c3e50; /* Color del texto */
+    background-color: rgba(229, 232, 236, 0.5); /* Gris claro transparente */
+    border: 1px solid #E5E8EC; /* Gris claro */
+    color: #4B5563; /* Gris oscuro */
 }
 
 .logout-btn:hover {
-    background-color: rgba(44, 62, 80, 0.2); /* Ajustado para el nuevo color */
+    background-color: rgba(229, 232, 236, 0.8); /* Gris claro más opaco */
 }
 
 /* === CONTENIDO PRINCIPAL === */
@@ -306,8 +306,8 @@ body {
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem;
-    background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Cambiado a azul claro */
-    color: #2c3e50; /* Cambiado a gris oscuro para mejor contraste */
+    background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro estandarizado */
+    color: #4B5563; /* Gris oscuro estandarizado */
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
@@ -363,15 +363,15 @@ body {
 }
 
 .stat-card-empleados .stat-icon {
-    color: #4CAF50;
+    color: #87CEEB; /* Azul claro */
 }
 
 .stat-card-programados .stat-icon {
-    color: #2196F3;
+    color: #7FC7D9; /* Azul medio claro */
 }
 
 .stat-card-completados .stat-icon {
-    color: #FF9800;
+    color: #6B7280; /* Gris oscuro */
 }
 
 .stat-number {
@@ -450,17 +450,17 @@ body {
 .card .btn {
     display: inline-block;
     padding: 0.8rem 2rem;
-    background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Cambiado a azul claro */
-    color: #2c3e50; /* Texto oscuro para mejor contraste */
+    background: linear-gradient(135deg, #87CEEB 0%, #B0C4DE 100%); /* Azul claro estandarizado */
+    color: #4B5563; /* Gris oscuro estandarizado */
     border-radius: 25px;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .card:hover .btn {
-    background: linear-gradient(135deg, #B0C4DE 0%, #87CEEB 100%); /* Cambiado a azul claro */
+    background: linear-gradient(135deg, #B0C4DE 0%, #87CEEB 100%); /* Azul claro invertido */
     transform: translateX(5px);
-    color: #2c3e50; /* Mantener texto oscuro */
+    color: #4B5563; /* Gris oscuro */
 }
 
 /* === IFRAMES === */
