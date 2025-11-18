@@ -2,6 +2,10 @@
 // Incluir archivo de conexión a la base de datos
 include 'conexion2.php';
 
+// Incluir servicio de email
+require_once 'EmailService.php';
+$emailService = new EmailService($conn);
+
 // Inicializar variables
 $mensaje = '';
 $cursoSeleccionado = false;
@@ -110,6 +114,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         
                         if (sqlsrv_execute($stmtInsertar)) {
                             $exitos++;
+
+                            // Obtener el ID de la capacitación recién insertada
+                            $sqlLastId = "SELECT @@IDENTITY AS LastID";
+                            $stmtLastId = sqlsrv_query($conn, $sqlLastId);
+                            $lastIdRow = sqlsrv_fetch_array($stmtLastId, SQLSRV_FETCH_ASSOC);
+                            $idCapacitacion = $lastIdRow['LastID'];
+
+                            // Obtener el correo del empleado para enviar notificación
+                            $sqlCorreo = "SELECT correo FROM usuarios WHERE Clave = ?";
+                            $paramsCorreo = array($idEmp);
+                            $stmtCorreo = sqlsrv_prepare($conn, $sqlCorreo, $paramsCorreo);
+                            sqlsrv_execute($stmtCorreo);
+                            $correoRow = sqlsrv_fetch_array($stmtCorreo, SQLSRV_FETCH_ASSOC);
+
+                            // Enviar notificación por email si el empleado tiene correo
+                            if ($correoRow && !empty($correoRow['correo'])) {
+                                $datosEmail = array(
+                                    'IdCapacitacion' => $idCapacitacion,
+                                    'IdEmp' => $idEmp,
+                                    'Empleado' => $empleado['NombreCompleto'],
+                                    'NomCurso' => $nombreCurso,
+                                    'Area' => $area,
+                                    'FechaIni' => $fechaIniObj,
+                                    'FechaFin' => $fechaFinObj,
+                                    'correo' => $correoRow['correo']
+                                );
+
+                                $emailService->enviarAsignacionCapacitacion($datosEmail);
+                            }
                         } else {
                             $errores[] = "Error al asignar al empleado {$empleado['NombreCompleto']}: " . print_r(sqlsrv_errors(), true);
                         }
@@ -148,13 +181,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Actualizar estado de asistencia
         $idCapacitacion = $_POST['idCapacitacion'];
         $asistio = $_POST['asistio'];
-        
+
         $sql = "UPDATE capacitaciones SET Asistio = ? WHERE Id = ?";
         $params = array($asistio, $idCapacitacion);
         $stmt = sqlsrv_prepare($conn, $sql, $params);
-        
+
         if (sqlsrv_execute($stmt)) {
             $mensaje = "Asistencia actualizada correctamente.";
+
+            // Si se marcó como asistió, enviar notificación de confirmación
+            if ($asistio == 'Si') {
+                // Obtener datos de la capacitación y empleado
+                $sqlDatos = "SELECT c.*, u.correo
+                            FROM capacitaciones c
+                            INNER JOIN usuarios u ON c.IdEmp = u.Clave
+                            WHERE c.Id = ?";
+                $paramsDatos = array($idCapacitacion);
+                $stmtDatos = sqlsrv_prepare($conn, $sqlDatos, $paramsDatos);
+                sqlsrv_execute($stmtDatos);
+                $datosCapacitacion = sqlsrv_fetch_array($stmtDatos, SQLSRV_FETCH_ASSOC);
+
+                // Enviar email de confirmación de asistencia si tiene correo
+                if ($datosCapacitacion && !empty($datosCapacitacion['correo'])) {
+                    $datosEmail = array(
+                        'IdCapacitacion' => $idCapacitacion,
+                        'IdEmp' => $datosCapacitacion['IdEmp'],
+                        'Empleado' => $datosCapacitacion['Empleado'],
+                        'NomCurso' => $datosCapacitacion['NomCurso'],
+                        'Area' => $datosCapacitacion['Area'],
+                        'FechaFin' => $datosCapacitacion['FechaFin'],
+                        'correo' => $datosCapacitacion['correo']
+                    );
+
+                    $emailService->enviarConfirmacionAsistencia($datosEmail);
+                }
+            }
         } else {
             $mensaje = "Error al actualizar la asistencia: " . print_r(sqlsrv_errors(), true);
         }
