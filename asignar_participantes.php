@@ -16,6 +16,7 @@ $fechaFin = '';
 $area = '';
 $idCurso = '';
 $fechaIniObj = null;
+$estadoCurso = '';
 
 // Si hay un ID de plan en la URL, cargar los detalles del curso
 if (!empty($idPlan)) {
@@ -34,7 +35,8 @@ if (!empty($idPlan)) {
             $fechaFin = $curso['FechaFin'] instanceof DateTime ? $curso['FechaFin']->format('Y-m-d') : '';
             $area = $curso['Area'];
             $idCurso = $curso['IdCurso'];
-            
+            $estadoCurso = $curso['Estado'];
+
             // Crear objeto DateTime para la fecha de inicio (necesario para consultas)
             if (!empty($fechaIni)) {
                 $fechaIniObj = date_create_from_format('Y-m-d', $fechaIni);
@@ -54,6 +56,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $fechaIni = $_POST['fechaIni'];
         $fechaFin = $_POST['fechaFin'];
         $area = $_POST['area'];
+
+        // Verificar el estado del curso antes de permitir agregar participantes
+        $sqlEstado = "SELECT Estado FROM plancursos WHERE IdPlan = ?";
+        $paramsEstado = array($idPlan);
+        $stmtEstado = sqlsrv_prepare($conn, $sqlEstado, $paramsEstado);
+        sqlsrv_execute($stmtEstado);
+        $cursoEstado = sqlsrv_fetch_array($stmtEstado, SQLSRV_FETCH_ASSOC);
+
+        if ($cursoEstado && $cursoEstado['Estado'] == 'Completado') {
+            $mensaje = "No se pueden agregar participantes a una capacitación completada.";
+        } else {
         
         // Convertir fechas a objetos DateTime
         $fechaIniObj = null;
@@ -165,6 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $mensaje = "Por favor, seleccione al menos un empleado para asignar al curso.";
         }
+        } // Cierre del else que verifica si el curso NO está completado
     } elseif (isset($_POST['eliminar_participante'])) {
         // Eliminar participante
         $idCapacitacion = $_POST['idCapacitacion'];
@@ -414,12 +428,33 @@ if ($cursoSeleccionado) {
                             <p><strong>Área:</strong> <?php echo $area; ?></p>
                             <p><strong>Fecha Inicio:</strong> <?php echo $fechaIni; ?></p>
                             <p><strong>Fecha Fin:</strong> <?php echo $fechaFin; ?></p>
+                            <p><strong>Estado:</strong>
+                                <?php
+                                $estadoClass = '';
+                                switch($estadoCurso) {
+                                    case 'Programado':
+                                        $estadoClass = 'text-primary';
+                                        break;
+                                    case 'En proceso':
+                                        $estadoClass = 'text-warning';
+                                        break;
+                                    case 'Completado':
+                                        $estadoClass = 'text-success';
+                                        break;
+                                    case 'Cancelado':
+                                        $estadoClass = 'text-danger';
+                                        break;
+                                }
+                                ?>
+                                <span class="<?php echo $estadoClass; ?>"><?php echo $estadoCurso; ?></span>
+                            </p>
                             <a href="asignar_participantes.php" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Volver a la lista de cursos
                             </a>
                         </div>
                     </div>
-                    
+
+                    <?php if ($estadoCurso != 'Completado'): ?>
                     <div class="card mt-4">
                         <div class="card-header bg-success text-white">
                             <h5 class="mb-0">Seleccionar Participantes</h5>
@@ -479,6 +514,16 @@ if ($cursoSeleccionado) {
                             </form>
                         </div>
                     </div>
+                    <?php else: ?>
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Capacitación Completada</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">No se pueden agregar más participantes a una capacitación que ya ha sido completada.</p>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="col-md-7">
